@@ -1,0 +1,36 @@
+[
+  {
+    "nombre": "PesoDigital",
+    "abrebiatura": "COPT",
+    "contrato": "TVy7Y7RF4tDyhQ8TuaXantkTA2TM1ombvG",
+    "urlWeb": "https://pesodigital.ml/",
+    "apiPrecio": "https://servicios-pesodigital.herokuapp.com/api/v1/servicio/precio/v1/COPT",
+    "estado": true
+  },
+  {
+    "nombre": "BrutusToken",
+    "abrebiatura": "BRUT",
+    "contrato": "TMnV9TeTFDUKmZR3ZQsMfd362hofvcFnqi",
+    "urlWeb": "https://brutustoken.tk/",
+    "apiPrecio": "https://brutusprecio.herokuapp.com/api/v1/precio/BRUT",
+    "estado": true
+  },
+  {
+    "nombre": "SITE",
+    "abrebiatura": "SITE",
+    "contrato": "TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz",
+    "pool": "TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU",
+    "urlWeb": "https://smartsitecapital.ml/",
+    "apiPrecio": "https://servicios-pesodigital.herokuapp.com/api/v1/servicio/precio/SITE",
+    "estado": true
+  },
+  {
+    "nombre": "Orbita",
+    "abrebiatura": "ORB",
+    "contrato": "TGJ31V8B9WC6Ew6v9Q68NAZfQV7BpRLoxq",
+    "pool": "TNZCD6aPJptmsZ7ZwGT9tUS45GRGfc53ZA",
+    "urlWeb": "https://orbita.com.py/",
+    "apiPrecio": "https://servicios-pesodigital.herokuapp.com/api/v1/servicio/precio/ORB",
+    "estado": true
+  }
+]
