@@ -13,9 +13,8 @@ const app = express();
 const port = process.env.PORT || 3004;
 const prykey = process.env.APP_PRYKEY;
 const red = process.env.APP_RED || "https://api.trongrid.io";
-const SC = process.env.APP_CONTRACT || "TYULMzkrw9mfGVVPJdxbP9K7og3Na5ajPv";
+const SC = process.env.APP_CONTRACT || "TWSh4xWpStE6ubPEQv7BgNtmtEejLjLNcg";
 const ver = process.env.APP_VERSION || "v1";
-const proxy = process.env.APP_PROXY || "https://proxy-wozx.herokuapp.com/";
 
 const TRONGRID_API = red;
 
@@ -36,7 +35,12 @@ app.use((req, res, next) => {
   next();
 });
 
-tronWeb = new TronWeb(TRONGRID_API, TRONGRID_API, TRONGRID_API, prykey);
+tronWeb = new TronWeb(
+    TRONGRID_API, 
+    TRONGRID_API, 
+    TRONGRID_API, 
+    prykey
+  );
 
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
@@ -136,6 +140,10 @@ app.get(ruta + "/servicio/precio/v1/COPT", async (req, res) => {
 });
 
 app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
+  var binarioSite = await tronWeb
+    .contract()
+    .at(SC);
+
   var contractSITE = await tronWeb
     .contract()
     .at("TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz");
@@ -183,13 +191,21 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
 
   var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
 
+  var precioContract = await binarioSite.rate().call();
+  precioContract = parseInt(precioContract._hex);
+
+  if ( parseInt(Price*100000000) != precioContract ) {
+    await binarioSite.setRate( parseInt(Price*100000000) ).send();
+  }
+
   var response = {
     Ok: true,
     Data: {
       precio: Price,
       par: "SITE_USD",
       var: (cambio24h - 1) * 100,
-    },
+      contract: precioContract
+    }
   };
   res.send(response);
 });
