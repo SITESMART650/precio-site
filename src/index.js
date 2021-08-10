@@ -192,6 +192,8 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
   var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
 
   var precioContract = await binarioSite.rate().call();
+
+  console.log(precioContract);
   precioContract = parseInt(precioContract._hex);
 
   var compartive = parseInt(Price*10000);
