@@ -139,7 +139,7 @@ app.get(ruta + "/servicio/precio/v1/COPT", async (req, res) => {
   res.send(response);
 });
 
-app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
+app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
   var binarioSite = await tronWeb
     .contract()
     .at(SC);
@@ -205,7 +205,6 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
       precio: Price,
       par: "SITE_USD",
       var: (cambio24h - 1) * 100,
-      hola: "no hay cambios",
       contract: precioContract
     }
   };
