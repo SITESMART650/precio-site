@@ -148,15 +148,11 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
     .contract()
     .at("TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz");
 
-  var balanceSITE = await contractSITE
-    .balanceOf("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU")
-    .call();
+  var balanceSITE = await contractSITE.balanceOf("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU").call();
 
   balanceSITE = balanceSITE / 100000000;
 
-  var balanceTRX = await tronWeb.trx.getBalance(
-    "TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU"
-  );
+  var balanceTRX = await tronWeb.trx.getBalance("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU");
 
   balanceTRX = balanceTRX / 1000000;
 
@@ -209,6 +205,7 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
       precio: Price,
       par: "SITE_USD",
       var: (cambio24h - 1) * 100,
+      hola: "no hay cambios",
       contract: precioContract
     }
   };
