@@ -194,8 +194,11 @@ app.get(ruta + "/servicio/precio/v1/SITE", async (req, res) => {
   var precioContract = await binarioSite.rate().call();
   precioContract = parseInt(precioContract._hex);
 
-  if ( parseInt(Price*100000000) != precioContract ) {
-    await binarioSite.setRate( parseInt(Price*100000000) ).send();
+  var compartive = parseInt(Price*10000);
+  compartive = compartive*10000;
+  if ( compartive != precioContract ) {
+    await binarioSite.setRateBuy( compartive ).send();
+    await binarioSite.setRateSell( compartive ).send();
   }
 
   var response = {
