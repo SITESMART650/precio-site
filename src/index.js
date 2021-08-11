@@ -211,6 +211,63 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
   res.send(response);
 });
 
+app.get(ruta + "/servicio/precio/v3/SITE", async (req, res) => {
+
+  var contractSITE = await tronWeb
+    .contract()
+    .at("TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz");
+
+  var balanceSITE = await contractSITE.balanceOf("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU").call();
+
+  balanceSITE = balanceSITE / 100000000;
+
+  var balanceTRX = await tronWeb.trx.getBalance("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU");
+
+  balanceTRX = balanceTRX / 1000000;
+
+  var end = Date.now();
+
+  end = parseInt(end / 1000);
+
+  var start = end - 172800 * 2;
+
+  let consulta = await fetch(
+    "https://api.just.network/swap/scan/statusinfo?exchangeAddress=TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU"
+  ).catch((error) => {
+    console.error(error);
+  });
+  var json = await consulta.json();
+
+  let consulta2 = await fetch(
+    "https://apilist.tronscan.io/api/justswap/kline?token_address=TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz&granularity=1d&time_start=" +
+      start +
+      "&time_end=" +
+      end
+  ).catch((error) => {
+    console.error(error);
+    console.log(consulta2);
+  });
+  var json2 = await consulta2.json();
+
+  var diferencia = json2.data;
+
+  var cambio24h =
+    diferencia[diferencia.length - 1].c / diferencia[diferencia.length - 2].c;
+
+  var Price = (balanceTRX / balanceSITE);
+
+
+  var response = {
+    Ok: true,
+    Data: {
+      precio: Price,
+      par: "SITE_TRX",
+      var: (cambio24h - 1) * 100
+    }
+  };
+  res.send(response);
+});
+
 app.get(ruta + "/servicio/precio/:moneda", async (req, res) => {
   let moneda = req.params.moneda;
 
