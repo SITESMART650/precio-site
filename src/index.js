@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT || 3004;
 const prykey = process.env.APP_PRYKEY;
 const red = process.env.APP_RED || "https://api.trongrid.io";
-const SC = process.env.APP_CONTRACT || "TWSh4xWpStE6ubPEQv7BgNtmtEejLjLNcg";
+const SC = process.env.APP_CONTRACT || "TPd9Xhoas9rWYsihNJFuShNnNbqd3vYbsV";
 const ver = process.env.APP_VERSION || "v1";
 
 const TRONGRID_API = red;
@@ -160,12 +160,6 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
     var balanceTRX = await tronWeb.trx.getBalance(found.pool);
   
     balanceTRX = balanceTRX / 10 ** 6;
-  
-    var end = Date.now();
-  
-    end = parseInt(end / 1000);
-  
-    var start = end - 172800 * 2;
   
     let consulta = await fetch(
       "https://api.just.network/swap/scan/statusinfo"
