@@ -145,11 +145,9 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
     .contract()
     .at(SC);
 
-    let moneda = req.params.moneda;
-
     const array1 = monedas;
   
-    const found = array1.find((element) => element.abrebiatura === moneda);
+    const found = array1.find((element) => element.abrebiatura === "SITE");
   
     var contractSITE = await tronWeb.contract().at(found.contrato);
   
