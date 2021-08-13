@@ -140,74 +140,64 @@ app.get(ruta + "/servicio/precio/v1/COPT", async (req, res) => {
 });
 
 app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
+
   var binarioSite = await tronWeb
     .contract()
     .at(SC);
 
-  var contractSITE = await tronWeb
-    .contract()
-    .at("TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz");
+    let moneda = req.params.moneda;
 
-  var balanceSITE = await contractSITE.balanceOf("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU").call();
+    const array1 = monedas;
+  
+    const found = array1.find((element) => element.abrebiatura === moneda);
+  
+    var contractSITE = await tronWeb.contract().at(found.contrato);
+  
+    var balanceSITE = await contractSITE.balanceOf(found.pool).call();
+  
+    var decimales = await contractSITE.decimals().call();
+  
+    balanceSITE = balanceSITE / 10 ** decimales;
+  
+    var balanceTRX = await tronWeb.trx.getBalance(found.pool);
+  
+    balanceTRX = balanceTRX / 10 ** 6;
+  
+    var end = Date.now();
+  
+    end = parseInt(end / 1000);
+  
+    var start = end - 172800 * 2;
+  
+    let consulta = await fetch(
+      "https://api.just.network/swap/scan/statusinfo"
+    ).catch((error) => {
+      console.error(error);
+    });
+    var json = await consulta.json();
+  
+    var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
 
-  balanceSITE = balanceSITE / 100000000;
+    var precioContract = await binarioSite.rate().call();
+    precioContract = parseInt(precioContract._hex);
 
-  var balanceTRX = await tronWeb.trx.getBalance("TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU");
-
-  balanceTRX = balanceTRX / 1000000;
-
-  var end = Date.now();
-
-  end = parseInt(end / 1000);
-
-  var start = end - 172800 * 2;
-
-  let consulta = await fetch(
-    "https://api.just.network/swap/scan/statusinfo?exchangeAddress=TMSRvNWKUTvMBaTPFGStWVNtRUQJD72skU"
-  ).catch((error) => {
-    console.error(error);
-  });
-  var json = await consulta.json();
-
-  let consulta2 = await fetch(
-    "https://apilist.tronscan.io/api/justswap/kline?token_address=TDDkSxfkN5DbqXK3tHSZFXRMcT9aS6m9qz&granularity=1d&time_start=" +
-      start +
-      "&time_end=" +
-      end
-  ).catch((error) => {
-    console.error(error);
-    console.log(consulta2);
-  });
-  var json2 = await consulta2.json();
-
-  var diferencia = json2.data;
-
-  var cambio24h =
-    diferencia[diferencia.length - 1].c / diferencia[diferencia.length - 2].c;
-
-  var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
-
-  var precioContract = await binarioSite.rate().call();
-
-  console.log(precioContract);
-  precioContract = parseInt(precioContract._hex);
-
-  var compartive = parseInt(Price*10000);
-  compartive = compartive*10000;
-  if ( compartive != precioContract ) {
-    await binarioSite.setRates( compartive, compartive ).send();
-  }
-
-  var response = {
-    Ok: true,
-    Data: {
-      precio: Price,
-      par: "SITE_USD",
-      var: (cambio24h - 1) * 100,
-      contract: precioContract
+    var compartive = parseInt(Price*10000);
+    compartive = compartive*10000;
+    
+    if ( compartive != precioContract ) {
+      await binarioSite.setRates( compartive, compartive ).send();
     }
-  };
-  res.send(response);
+  
+    var response = {
+      Ok: true,
+      Data: {
+        precio: Price,
+        par: found.abrebiatura + "_USD",
+        contract: precioContract
+      },
+    };
+    res.send(response);
+
 });
 
 app.get(ruta + "/servicio/precio/v3/SITE", async (req, res) => {
