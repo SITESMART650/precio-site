@@ -5,6 +5,8 @@ const fetch = require("node-fetch");
 
 const monedas = require("./monedas.json");
 
+const Agenda = require("agenda");
+
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 //console.log(datos);
@@ -41,6 +43,57 @@ tronWeb = new TronWeb(
     TRONGRID_API, 
     prykey
   );
+
+
+  const agenda = new Agenda();
+
+agenda.define("actualizar precio contrato", async (job) => {
+  var binarioSite = await tronWeb
+    .contract()
+    .at(SC);
+
+    const array1 = monedas;
+  
+    const found = array1.find((element) => element.abrebiatura === "SITE");
+  
+    var contractSITE = await tronWeb.contract().at(found.contrato);
+  
+    var balanceSITE = await contractSITE.balanceOf(found.pool).call();
+  
+    var decimales = await contractSITE.decimals().call();
+  
+    balanceSITE = balanceSITE / 10 ** decimales;
+  
+    var balanceTRX = await tronWeb.trx.getBalance(found.pool);
+  
+    balanceTRX = balanceTRX / 10 ** 6;
+  
+    let consulta = await fetch(
+      "https://api.just.network/swap/scan/statusinfo"
+    ).catch((error) => {
+      console.error(error);
+    });
+    var json = await consulta.json();
+  
+    var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
+
+    var precioContract = await binarioSite.rate().call();
+    precioContract = parseInt(precioContract._hex);
+
+    var compartive = parseInt(Price*10000);
+    compartive = compartive*10000;
+    
+    if ( compartive != precioContract ) {
+      await binarioSite.setRates( compartive, compartive ).send();
+    }
+});
+
+(async function () {
+  // IIFE to give access to async/await
+  await agenda.start();
+
+  await agenda.every("1 minutes", "actualizar precio contrato");
+})();
 
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
