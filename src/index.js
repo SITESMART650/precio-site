@@ -42,6 +42,15 @@ tronWeb = new TronWeb(
     prykey
   );
 
+  var cont = 0;
+
+  async function contador(){
+    console.log(cont);
+    cont++;
+  }
+
+  setInterval(contador(),3*1000);
+
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
 });
@@ -172,13 +181,6 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
 
     var precioContract = await binarioSite.rate().call();
     precioContract = parseInt(precioContract._hex);
-
-    var compartive = parseInt(Price*1000);
-    compartive = compartive*100000;
-    
-    if ( compartive != precioContract ) {
-      await binarioSite.setRates( compartive, compartive ).send();
-    }
   
     var response = {
       Ok: true,
@@ -247,6 +249,59 @@ app.get(ruta + "/servicio/precio/v3/SITE", async (req, res) => {
     }
   };
   res.send(response);
+});
+
+app.get(ruta + "/servicio/precio/v4/SITE", async (req, res) => {
+
+  var binarioSite = await tronWeb
+    .contract()
+    .at(SC);
+
+    const array1 = monedas;
+  
+    const found = array1.find((element) => element.abrebiatura === "SITE");
+  
+    var contractSITE = await tronWeb.contract().at(found.contrato);
+  
+    var balanceSITE = await contractSITE.balanceOf(found.pool).call();
+  
+    var decimales = await contractSITE.decimals().call();
+  
+    balanceSITE = balanceSITE / 10 ** decimales;
+  
+    var balanceTRX = await tronWeb.trx.getBalance(found.pool);
+  
+    balanceTRX = balanceTRX / 10 ** 6;
+  
+    let consulta = await fetch(
+      "https://api.just.network/swap/scan/statusinfo"
+    ).catch((error) => {
+      console.error(error);
+    });
+    var json = await consulta.json();
+  
+    var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
+
+    var precioContract = await binarioSite.rate().call();
+    precioContract = parseInt(precioContract._hex);
+
+    var compartive = parseInt(Price*10000);
+    compartive = compartive*10000;
+    
+    if ( compartive != precioContract ) {
+      await binarioSite.setRates( compartive, compartive ).send();
+    }
+  
+    var response = {
+      Ok: true,
+      Data: {
+        precio: Price,
+        par: found.abrebiatura + "_USD",
+        contract: precioContract
+      },
+    };
+    res.send(response);
+
 });
 
 app.get(ruta + "/servicio/precio/:moneda", async (req, res) => {
