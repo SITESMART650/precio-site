@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 
 const monedas = require("./monedas.json");
 
-const Agenda = require("agenda");
+var cron = require('node-cron');
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -45,9 +45,8 @@ tronWeb = new TronWeb(
   );
 
 
-  const agenda = new Agenda();
 
-agenda.define("actualizar precio contrato", async (job) => {
+async function upDatePrecio(){
   var binarioSite = await tronWeb
     .contract()
     .at(SC);
@@ -86,14 +85,17 @@ agenda.define("actualizar precio contrato", async (job) => {
     if ( compartive != precioContract ) {
       await binarioSite.setRates( compartive, compartive ).send();
     }
+
+    console.log(precioContract);
+    console.log(compartive);
+};
+
+
+cron.schedule('* * * * *', async() => {
+  await upDatePrecio();
+
+  console.log('running a task every minute');
 });
-
-(async function () {
-  // IIFE to give access to async/await
-  await agenda.start();
-
-  await agenda.every("1 minutes", "actualizar precio contrato");
-})();
 
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
@@ -222,6 +224,7 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
     var json = await consulta.json();
   
     var Price = (balanceTRX / balanceSITE) * json.data.trxPrice;
+    Price = parseInt(Price*10000)/10000;
 
     var precioContract = await binarioSite.rate().call();
     precioContract = parseInt(precioContract._hex);
