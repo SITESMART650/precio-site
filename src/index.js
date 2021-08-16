@@ -42,15 +42,6 @@ tronWeb = new TronWeb(
     prykey
   );
 
-  var cont = 0;
-
-  async function contador(){
-    console.log(cont);
-    cont++;
-  }
-
-  setInterval(contador(),3*1000);
-
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
 });
