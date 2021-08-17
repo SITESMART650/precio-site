@@ -82,12 +82,15 @@ async function upDatePrecio(){
     var compartive = parseInt(Price*10000);
     compartive = compartive*10000;
     
-    if ( compartive != precioContract ) {
-      await binarioSite.setRates( compartive, compartive ).send();
+    if ( compartive != precioContract && await tronWeb.trx.getAccount() == await binarioSite.api().call() ) {
+      console.log("New price: "+compartive);
+      //await binarioSite.setRates( compartive, compartive ).send();
+    }else{
+      console.log("Contract: "+precioContract);
+      console.log("Api: "+compartive);
     }
 
-    console.log(precioContract);
-    console.log(compartive);
+    
 };
 
 
