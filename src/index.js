@@ -235,9 +235,10 @@ app.get(ruta + "/servicio/precio/v2/SITE", async (req, res) => {
     var response = {
       Ok: true,
       Data: {
-        precio: Price,
+        precio: (precioContract/100000000),
         par: found.abrebiatura + "_USD",
-        contract: precioContract
+        contract: precioContract,
+        real: Price
       },
     };
     res.send(response);
