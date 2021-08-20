@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 
 const monedas = require("./monedas.json");
 
-var cron = require('node-cron');
+/*var cron = require('node-cron');*/
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -45,7 +45,7 @@ tronWeb = new TronWeb(
   );
 
 
-
+/*
 async function upDatePrecio(){
   var binarioSite = await tronWeb
     .contract()
@@ -99,6 +99,8 @@ cron.schedule('* * * * *', async() => {
 
   console.log('running a task every minute');
 });
+
+*/
 
 app.get("/", async (req, res) => {
   res.send('<a href="/api/v1">API versión 1.2.1</a>');
