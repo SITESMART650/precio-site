@@ -357,6 +357,29 @@ app.get(ruta + "/servicio/precio/v4/SITE", async (req, res) => {
 
 });
 
+app.get(ruta + "/servicio/precio/v5/SITE", async (req, res) => {
+
+
+  let consulta = await fetch(
+    "https://api.crex24.com/v2/public/tickers?instrument=SITE-USDT"
+  ).catch((error) => {
+    console.error(error);
+  });
+  var json = await consulta.json();
+  json = json[0];
+
+
+  var response = {
+    Ok: true,
+    Data: {
+      precio: json.last,
+      par: "SITE_USDT",
+      source: "CREX24"
+    }
+  };
+  res.send(response);
+});
+
 app.get(ruta + "/servicio/precio/:moneda", async (req, res) => {
   let moneda = req.params.moneda;
 
